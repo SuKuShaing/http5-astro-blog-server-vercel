@@ -3,8 +3,6 @@ import { defineConfig } from 'astro/config';
 import mdx from '@astrojs/mdx';
 import sitemap from '@astrojs/sitemap';
 
-import cloudflare from '@astrojs/cloudflare';
-
 import db from '@astrojs/db';
 
 // import node from '@astrojs/node';
@@ -19,5 +17,4 @@ export default defineConfig({
   // }),
   integrations: [mdx(), sitemap(), db()],
 
-  adapter: cloudflare(),
 });
