@@ -18,6 +18,6 @@ const { Content } = await render(post);
 ---
 
 <BlogPost {...post.data}>
-	<BtnReact client:only />
+	<BtnReact postId={post.id} client:only />
 	<Content />
 </BlogPost>
