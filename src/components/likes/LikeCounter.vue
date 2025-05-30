@@ -1,13 +1,53 @@
 <template>
-    <button @click="likePost">
-        Like Counter
+	<button disabled class="loading" v-if="isLoading">
+		Loading...
+	</button>
+
+    <button v-else-if="likeCount===0" @click="likePost">
+		Like this post
+    </button>
+
+    <button v-else @click="likePost">
+		Likes
+		<span>{{ likeCount }}</span>
     </button>
 </template>
 
 <script lang="ts" setup>
+import { ref } from 'vue'; // Importamos ref de Vue para manejar el estado reactivo
+
+interface Props {
+	postId: string;
+}
+
+const props = defineProps<Props>(); // aquí traemos las propiedades del componente
+console.log(`Post ID: ${props.postId}`);
+
+const likeCount = ref(0);
+const likeClicks = ref(0);
+const isLoading = ref(true);
+
+
 const likePost = () => {
 	console.log('Post liked!');
 }
+
+
+const getCurrentLikes = async () => {
+	const resp = await fetch(`/api/posts/likes/${props.postId}`);
+	if (!resp.ok) {
+		console.error('Error fetching likes:', resp.statusText);
+		return;
+	}
+
+	const data = await resp.json();
+	console.log("🚀 ~ getCurrentLikes ~ data:", data)
+
+	likeCount.value = data.likes;
+	isLoading.value = false;
+}
+
+getCurrentLikes();
 </script>
 
 <style scoped>
