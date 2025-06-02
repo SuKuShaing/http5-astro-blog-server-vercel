@@ -16,7 +16,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue'; // Importamos ref de Vue para manejar el estado reactivo
+import { ref, watch } from 'vue'; // Importamos ref de Vue para manejar el estado reactivo
 import confetti from 'canvas-confetti';
 
 interface Props {
@@ -29,6 +29,20 @@ console.log(`Post ID: ${props.postId}`);
 const likeCount = ref(0);
 const likeClicks = ref(0);
 const isLoading = ref(true);
+
+watch( likeCount, () => {
+
+	fetch(`/api/posts/likes/${props.postId}`, {
+		method: 'PUT',
+		headers: {
+			'Content-Type': 'application/json',
+		},
+		body: JSON.stringify({ likes: likeClicks.value }),
+	})
+	likeClicks.value = 0; // Resetear el contador de clics después de enviar
+
+})
+
 
 
 const likePost = () => {
@@ -66,7 +80,7 @@ getCurrentLikes();
 
 <style scoped>
 button {
-	background-color: #5e51bc;
+	background-color: #36a070;
 	color: white;
 	padding: 10px 20px;
 	border: none;
@@ -76,6 +90,6 @@ button {
 }
 
 button:hover {
-	background-color: #4a3f9a;
+	background-color: #246e4d;
 }
 </style>
