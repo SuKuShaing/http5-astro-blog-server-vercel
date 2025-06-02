@@ -22,19 +22,39 @@ const BtnReact = ({ postId }) => {
 		fetchLikes();
 	}, [postId]);
 
-	const darLike = () => {
+	const darLike = async () => {
 		setLikes((prevLikes) => prevLikes + 1);
 		setClickDados((prevClick) => prevClick + 1);
+
+		// obtener posición actual del mouse
+		const mouseX = window.event.clientX || 0;
+		const mouseY = window.event.clientY || 0;
 
 		confetti({
 			particleCount : 150,
 			startVelocity: 50,
 			spread: 90,
 			origin: {
-				x: Math.random(),
-				y: Math.random() - 0.2,
+				x: mouseX / window.innerWidth,
+				y: mouseY / window.innerHeight,
 			},
 		});
+
+		// Envía el nuevo like al backend
+		try {
+			await fetch(`/api/likes/${postId}`, {
+				method: "PUT",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({ clickDados }),
+			});
+		} catch (error) {
+			console.error("Error actualizando likes:", error);
+		}
+
+		// resetea el contador de clics después de 2 segundos
+		setClickDados(0);
 	};
 
 	return (
