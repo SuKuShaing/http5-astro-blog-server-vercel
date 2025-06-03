@@ -1,10 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import confetti from "canvas-confetti";
 
 const BtnReact = ({ postId }) => {
 	const [isLoading, setIsLoading] = useState(true);
 	const [likes, setLikes] = useState(0);
 	const [clickDados, setClickDados] = useState(0);
+	const debounceRef = useRef();
 
 	// obtener likes de la base de datos
 	useEffect(() => {
@@ -31,7 +32,7 @@ const BtnReact = ({ postId }) => {
 		const mouseY = window.event.clientY || 0;
 
 		confetti({
-			particleCount : 150,
+			particleCount: 150,
 			startVelocity: 50,
 			spread: 90,
 			origin: {
@@ -39,23 +40,32 @@ const BtnReact = ({ postId }) => {
 				y: mouseY / window.innerHeight,
 			},
 		});
-
-		// Envía el nuevo like al backend
-		try {
-			await fetch(`/api/likes/${postId}`, {
-				method: "PUT",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify({ clickDados }),
-			});
-		} catch (error) {
-			console.error("Error actualizando likes:", error);
-		}
-
-		// resetea el contador de clics después de 2 segundos
-		setClickDados(0);
 	};
+
+	// Debounce para enviar likes acumulados al backend
+	useEffect(() => {
+		if (clickDados === 0) return;
+
+		if (debounceRef.current) clearTimeout(debounceRef.current);  //sí debounceRef.current existe, limpia la referencia de tiempo anterior
+
+		debounceRef.current = setTimeout(async () => {
+			try {
+				await fetch(`/api/likes/${postId}`, {
+					// Envía el nuevo like al backend
+					method: "PUT",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify({ likes }),
+				});
+				setClickDados(0); // Resetea el contador después de enviar
+			} catch (error) {
+				console.error("Error actualizando likes:", error);
+			}
+		}, 500);
+
+		return () => clearTimeout(debounceRef.current);
+	}, [clickDados]);
 
 	return (
 		<>
