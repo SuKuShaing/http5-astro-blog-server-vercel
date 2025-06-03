@@ -12,12 +12,13 @@
 		<span>{{ likeCount }}</span>
     </button>
 
-	{{ likeClicks }}
+	<!-- {{ likeClicks }} -->
 </template>
 
 <script lang="ts" setup>
 import { ref, watch } from 'vue'; // Importamos ref de Vue para manejar el estado reactivo
 import confetti from 'canvas-confetti';
+import debounce from 'lodash.debounce';
 
 interface Props {
 	postId: string;
@@ -30,7 +31,7 @@ const likeCount = ref(0);
 const likeClicks = ref(0);
 const isLoading = ref(true);
 
-watch( likeCount, () => {
+watch( likeCount, debounce(() => {
 
 	fetch(`/api/posts/likes/${props.postId}`, {
 		method: 'PUT',
@@ -41,7 +42,7 @@ watch( likeCount, () => {
 	})
 	likeClicks.value = 0; // Resetear el contador de clics después de enviar
 
-})
+}, 500));
 
 
 
