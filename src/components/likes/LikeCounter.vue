@@ -19,6 +19,7 @@
 import { ref, watch } from 'vue'; // Importamos ref de Vue para manejar el estado reactivo
 import confetti from 'canvas-confetti';
 import debounce from 'lodash.debounce';
+import { actions } from 'astro:actions';
 
 interface Props {
 	postId: string;
@@ -46,9 +47,21 @@ watch( likeCount, debounce(() => {
 
 
 
-const likePost = () => {
+const likePost = async () => {
 	likeCount.value++;
 	likeClicks.value++;
+
+	const {data, error} = await actions.getGreeting({
+		name: 'John',
+		age: 30,
+		isActive: true,
+	});
+
+	if (error) {
+		return alert('Algo salió mal');
+	}
+
+	console.log(data);
 
 	confetti({
 		particleCount: 100,
