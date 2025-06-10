@@ -32,15 +32,27 @@ const likeCount = ref(0);
 const likeClicks = ref(0);
 const isLoading = ref(true);
 
-watch( likeCount, debounce(() => {
+watch( likeCount, debounce(async () => {
 
-	fetch(`/api/posts/likes/${props.postId}`, {
-		method: 'PUT',
-		headers: {
-			'Content-Type': 'application/json',
-		},
-		body: JSON.stringify({ likes: likeClicks.value }),
-	})
+	// fetch(`/api/posts/likes/${props.postId}`, {
+	// 	method: 'PUT',
+	// 	headers: {
+	// 		'Content-Type': 'application/json',
+	// 	},
+	// 	body: JSON.stringify({ likes: likeClicks.value }),
+	// })
+
+	// const { data, error } = await actions.updatePostLikesAction({
+	await actions.updatePostLikesAction({
+		postId: props.postId,
+		increment: likeClicks.value,
+	});
+
+	// if (error) {
+	// 	console.error('Error actualizando los likes:', error);
+	// 	return;
+	// }
+
 	likeClicks.value = 0; // Resetear el contador de clics después de enviar
 
 }, 500));
@@ -51,17 +63,17 @@ const likePost = async () => {
 	likeCount.value++;
 	likeClicks.value++;
 
-	const {data, error} = await actions.getGreeting({
-		name: 'John',
-		age: 30,
-		isActive: true,
-	});
+	// const {data, error} = await actions.getGreeting({
+	// 	name: 'John',
+	// 	age: 30,
+	// 	isActive: true,
+	// });
 
-	if (error) {
-		return alert('Algo salió mal');
-	}
+	// if (error) {
+	// 	return alert('Algo salió mal');
+	// }
 
-	console.log(data);
+	// console.log(data);
 
 	confetti({
 		particleCount: 100,
@@ -85,7 +97,7 @@ const getCurrentLikes = async () => {
 	const { data, error } = await actions.getPostLikesAction( props.postId )
 
 	if (error) {
-		console.error('Error fetching likes:', error);
+		console.error('Error obteniendo los likes:', error);
 		return;
 	}
 
